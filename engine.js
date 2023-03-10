@@ -6,12 +6,12 @@ class Move {
         this.searchMove()
     };
 
-    searchMove = id => {
+    searchMove = () => {
         fetch(`https://pokeapi.co/api/v2/move/${this.name}`)
             .then(response => response.json())
             .then(data => this.setStats(data))
             // .catch(err => console.log("ID incorrecto"))
-            .catch(err => alert("ID incorrecto"))
+            // .catch(err => alert("ID incorrecto"))
     };
 
     setStats(data) {
@@ -38,6 +38,7 @@ class Pokemon {
         this.level = 5
         this.baseStats = {}
         this.stats = {}
+        this.currentHp = null
         this.iv = []
         this.growthRate = null
         this.movesNames = []
@@ -45,12 +46,14 @@ class Pokemon {
         this.searchPokemon(this.id)
     };
 
-    searchPokemon = id => {
-        fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-            .then(response => response.json())
-            // .then(data => console.log(data))
-            .then(data => this.setInfo(data))
-        // .catch(err => alert("ID incorrecto"))
+    searchPokemon = async id => {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const data = await response?.json();
+        if (data) {
+            this.setInfo(data);
+        } else {
+            console.error(`Error al buscar al Pokemon con ID: ${id}`);
+        }
     };
 
     setInfo = data => {
@@ -65,8 +68,8 @@ class Pokemon {
             xp: data.base_experience
         }
         this.sprites = {
-            "front": data.sprites.front_default,
-            "back": data.sprites.back_default
+            front: data.sprites.front_default,
+            back: data.sprites.back_default
         }
         data.types.forEach(type => {
             this.types.push(type.type.name)
@@ -77,7 +80,7 @@ class Pokemon {
             }
         })
         this.iv = this.getIvStats()
-        this.getNature()
+        // this.getNature()
         this.getStats()
         this.getGrowthRate()
         this.getMoves(this.movesNames)
@@ -103,19 +106,19 @@ class Pokemon {
         return iv
     };
 
-    getNature = () => {
-        const i = Math.ceil(Math.random() * 25)
-        fetch(`https://pokeapi.co/api/v2/nature/${i}`)
-            .then(response => response.json())
-            // .then(data => console.log(data))
-            .then(data => this.setNature(data))
-            // .catch(err => console.log("ID incorrecto"))
-            .catch(err => alert("ID incorrecto"))
-    };
+    // getNature = () => {
+    //     const i = Math.ceil(Math.random() * 25)
+    //     fetch(`https://pokeapi.co/api/v2/nature/${i}`)
+    //         .then(response => response.json())
+    //         // .then(data => console.log(data))
+    //         .then(data => this.setNature(data))
+    //         // .catch(err => console.log("ID incorrecto"))
+    //         // .catch(err => alert("ID incorrecto"))
+    // };
 
-    setNature = (data) => {
-
-    };
+    // setNature = (data) => {
+    //
+    // };
 
     getStats = () => {
         this.stats = {
@@ -132,6 +135,7 @@ class Pokemon {
             speed: this.calculateStat(
                 this.baseStats.speed[0], this.iv[5], this.baseStats.speed[1], 1, false),
         }
+        this.currentHp = this.stats.hp
         return this.stats
     };
 
@@ -207,3 +211,8 @@ class Battle {
         this.allyTurn = this.ally.stats.speed >= this.enemy.stats.speed
     }
 }
+
+// const pok = new Pokemon(1)
+// setTimeout(() => {
+//     console.log(pok.sprites.front)
+// }, 1500);
