@@ -15,9 +15,14 @@ h1 {
     left: 0;
     opacity: 0;
     pointer-events: none;
+    z-index: 10;
 }
 
 /* Informacion de pokemones en pantalla*/
+#user-interface {
+    display: none;
+}
+
 .poke-info {
     position: absolute;
     font-size: 32px;
@@ -41,8 +46,8 @@ h1 {
 
 #ally-info {
     position: absolute;
-    top: 230px;
-    left: 500px;
+    top: 240px;
+    left: 550px;
 }
 
 .hp-bar #ally-hp {
@@ -105,7 +110,7 @@ h1 {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.attack-bar .buttons .button {
+.attack-bar .buttons button {
     background-color: rgb(248, 248, 248);
     border: 0;
     cursor: pointer;
@@ -113,7 +118,7 @@ h1 {
     font-family: monospace;
 }
 
-.attack-bar .buttons .button:hover {
+.attack-bar .buttons button:hover {
     background-color: #ddd;
 }
 

@@ -16,10 +16,10 @@ class Move {
 
     setStats(data) {
         this.stats = {
-            "accuracy": data.accuracy,
-            "power": data.power,
-            "pp": data.pp,
-            "type": data.type.name
+            accuracy: data.accuracy,
+            power: data.power,
+            pp: data.pp,
+            type: data.type.name
         }
     };
 
@@ -42,7 +42,7 @@ class Pokemon {
         this.iv = []
         this.growthRate = null
         this.movesNames = []
-        this.moves = []
+        this.moves = [new Move("tackle"), new Move("razor-leaf")]
         this.searchPokemon(this.id)
     };
 
@@ -74,16 +74,16 @@ class Pokemon {
         data.types.forEach(type => {
             this.types.push(type.type.name)
         })
-        data.moves.forEach(move => {
-            if (move.version_group_details.length >= 7 && move.version_group_details[6].move_learn_method.name === "level-up") {
-                this.movesNames.push(move.move.name)
-            }
-        })
+        // this.moves.push(new Move("tackle"), new Move("razor-leaf"))
+        // data.moves.forEach(move => {
+        //     if (move.version_group_details.length >= 7 && move.version_group_details[6].move_learn_method.name === "level-up") {
+        //     }
+        // })
         this.iv = this.getIvStats()
         // this.getNature()
         this.getStats()
         this.getGrowthRate()
-        this.getMoves(this.movesNames)
+        // this.getMoves(this.movesNames)
     };
 
     calculateStat = (base, iv, ev, nature, isHp) => {
@@ -197,9 +197,20 @@ class Pokemon {
     };
 
     getMoves = () => {
-        this.movesNames.forEach(move => {
-            this.moves.push(new Move(move))
-        })
+        // this.movesNames.forEach(move => {
+        //     this.moves.push(new Move(move))
+        // })
+        this.moves = [new Move("tackle")]
+        switch (this.types[0]) {
+            case "grass":
+                this.moves.push(new Move("razor-leaf"))
+                break;
+            case "fire":
+                this.moves.push(new Move("razor-leaf"))
+                break;
+            case "water":
+                this.moves.push(new Move("water-gun"))
+        }
     }
 }
 
@@ -210,8 +221,31 @@ class Battle {
         this.enemy = enemy
         this.allyTurn = this.ally.stats.speed >= this.enemy.stats.speed
     }
+
+
 }
 
+getDamage = (maker, move, receiver) => {
+    const v = Math.floor(Math.random() * 15) + 85
+    const n = maker.level
+    const e = 1 // codear formula
+    const b = 1 // codear formula
+    // if (move.stats.type === "normal") {
+    //     const a = maker.baseStats.attack
+    //     const d = receiver.baseStats.defense
+    // } else if(move.stats.type !== "normal") {
+    //     const a = maker.baseStats.sp_attack
+    //     const d = receiver.baseStats.sp_defense
+    // } else {
+    //     const a = 1
+    //     const d = 1
+    // }
+    const a = maker.baseStats.attack[0]
+    const d = receiver.baseStats.defense[0]
+    const p = move.stats.power
+    const damage = 0.01 * b * e * v * ((((0.2 * n + 1) * a * p)/(25 * d)) + 2)
+    return Math.floor(damage)
+}
 // const pok = new Pokemon(1)
 // setTimeout(() => {
 //     console.log(pok.sprites.front)
