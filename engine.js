@@ -3,6 +3,7 @@ class Move {
     constructor(name) {
         this.name = name
         this.stats = null
+        this.currentPP = 0
         this.searchMove()
     };
 
@@ -21,6 +22,7 @@ class Move {
             pp: data.pp,
             type: data.type.name
         }
+        this.currentPP = this.stats.pp
     };
 
     get getStats() {
@@ -39,11 +41,16 @@ class Pokemon {
         this.baseStats = {}
         this.stats = {}
         this.currentHp = null
+        this.currentXp = 0
         this.iv = []
         this.growthRate = null
         this.movesNames = []
-        this.moves = [new Move("tackle"), new Move("razor-leaf")]
-        this.searchPokemon(this.id)
+        this.moves = null
+            //{
+            // "tackle": new Move("tackle"),
+            // "razor-leaf": new Move("razor-leaf")
+        // }
+        // this.searchPokemon(this.id)
     };
 
     searchPokemon = async id => {
@@ -74,6 +81,7 @@ class Pokemon {
         data.types.forEach(type => {
             this.types.push(type.type.name)
         })
+        this.moves = this.getMoves()
         // this.moves.push(new Move("tackle"), new Move("razor-leaf"))
         // data.moves.forEach(move => {
         //     if (move.version_group_details.length >= 7 && move.version_group_details[6].move_learn_method.name === "level-up") {
@@ -200,29 +208,33 @@ class Pokemon {
         // this.movesNames.forEach(move => {
         //     this.moves.push(new Move(move))
         // })
-        this.moves = [new Move("tackle")]
+        let moves
         switch (this.types[0]) {
             case "grass":
-                this.moves.push(new Move("razor-leaf"))
+                moves = {
+                    "tackle": new Move("tackle"),
+                    "razor-leaf": new Move("razor-leaf")
+                }
                 break;
             case "fire":
-                this.moves.push(new Move("razor-leaf"))
+                moves = {
+                    "tackle": new Move("tackle"),
+                    "razor-leaf": new Move("razor-leaf")
+                }
                 break;
             case "water":
-                this.moves.push(new Move("water-gun"))
+                moves = {
+                    "tackle": new Move("tackle"),
+                    "razor-leaf": new Move("razor-leaf")
+                }
         }
-    }
-}
-
-// Clase Battle encargada de menejar la batalla entre dos pokemones
-class Battle {
-    constructor(ally, enemy) {
-        this.ally = ally
-        this.enemy = enemy
-        this.allyTurn = this.ally.stats.speed >= this.enemy.stats.speed
+        return moves
     }
 
-
+    levelUp = () => {
+        this.level += 1
+        this.currentXp = 0
+    }
 }
 
 getDamage = (maker, move, receiver) => {
@@ -246,7 +258,11 @@ getDamage = (maker, move, receiver) => {
     const damage = 0.01 * b * e * v * ((((0.2 * n + 1) * a * p)/(25 * d)) + 2)
     return Math.floor(damage)
 }
-// const pok = new Pokemon(1)
-// setTimeout(() => {
-//     console.log(pok.sprites.front)
-// }, 1500);
+
+getExperience = (winner, looser) => {
+    const e = looser.baseStats.xp
+    const l = looser.level
+    const c = 1
+    return Math.floor((e * l * c) / 7)
+
+}

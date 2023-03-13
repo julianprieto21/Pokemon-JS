@@ -100,8 +100,8 @@ const keys = {
     },
 }
 
-const movables = [background, ...boundaries, foreground, ...battleZones]
-const renderables = [background, ...boundaries, ...battleZones, player, foreground]
+const movables = [background, foreground, ...battleZones, ...boundaries]
+const renderables = [background, player, foreground]//, ...battleZones, ...boundaries]
 const battle = {
     initiated: false
 }
@@ -173,7 +173,7 @@ function animate() {
                     rect1: player,
                     rect2: {...boundary, position: {
                         x: boundary.position.x,
-                        y: boundary.position.y + 5
+                        y: boundary.position.y + player.speed
                         }
                     }
                 })
@@ -185,7 +185,7 @@ function animate() {
         }
         if (moving)
             movables.forEach((movable) => {
-                movable.position.y += 5
+                movable.position.y += player.speed
             })
     } else if (keys.s.pressed && lastKey === "s") {
         player.animate = true
@@ -197,7 +197,7 @@ function animate() {
                     rect1: player,
                     rect2: {...boundary, position: {
                             x: boundary.position.x,
-                            y: boundary.position.y - 5
+                            y: boundary.position.y - player.speed
                         }
                     }
                 })
@@ -209,7 +209,7 @@ function animate() {
         }
         if (moving)
         movables.forEach((movable) => {
-            movable.position.y -= 5
+            movable.position.y -= player.speed
         })
     } else if (keys.a.pressed && lastKey === "a") {
         player.animate = true
@@ -220,7 +220,7 @@ function animate() {
                 rectCollision({
                     rect1: player,
                     rect2: {...boundary, position: {
-                            x: boundary.position.x + 5,
+                            x: boundary.position.x + player.speed,
                             y: boundary.position.y
                         }
                     }
@@ -233,7 +233,7 @@ function animate() {
         }
         if (moving)
         movables.forEach((movable) => {
-            movable.position.x += 5
+            movable.position.x += player.speed
         })
     } else if (keys.d.pressed && lastKey === "d") {
         player.animate = true
@@ -244,7 +244,7 @@ function animate() {
                 rectCollision({
                     rect1: player,
                     rect2: {...boundary, position: {
-                            x: boundary.position.x - 5,
+                            x: boundary.position.x - player.speed,
                             y: boundary.position.y
                         }
                     }
@@ -256,7 +256,7 @@ function animate() {
         }
         if (moving)
         movables.forEach((movable) => {
-            movable.position.x -= 5
+            movable.position.x -= player.speed
         })
     }
 }
@@ -299,6 +299,10 @@ window.addEventListener("keyup", (e) => {
     }
 })
 
+// animate()
+// console.log(player)
+initBattle(player.team[0])
+animateBattle()
 
 
 

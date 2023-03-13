@@ -13,7 +13,15 @@ class Boundary {
 }
 
 class Sprite {
-    constructor({ position, image, frames = {max: 1, hold: 10}, sprites, pokemon, animate, isEnemy = false }) {
+    constructor({ position,
+                    image,
+                    frames = {max: 1, hold: 10},
+                    sprites,
+                    pokemon,
+                    animate,
+                    isEnemy = false,
+                    speed = 5,
+                    team = [1, 7, 110]}) {
         this.position = position
         this.image = image
         this.frames = {...frames, val: 0, elapsed: 0}
@@ -24,9 +32,10 @@ class Sprite {
         this.pokemon = pokemon
         this.animate = animate
         this.sprites = sprites
+        this.speed = speed
+        this.team = team
         this.opacity = 1
         this.isEnemy = isEnemy
-        this.currentHp = 20
     }
     draw() {
         c.save()
@@ -74,19 +83,22 @@ class Sprite {
     }
 
     attack({move, receiver, renderedSprites}) {
-        document.querySelector("#dialogue-box").style.display = "block"
-        const dialogue = this.pokemon.name + " usó " + move.name + "!"
-        document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
         let movementDistance = 20
         let healthBar = "#enemy-hp"
+        let enemyText = ""
         if (this.isEnemy) {
             movementDistance = -20
             healthBar = "#ally-hp"
+            enemyText = " enemigo "
         }
+        document.querySelector("#dialogue-box").style.display = "block"
+        const dialogue = this.pokemon.name + enemyText + " usó " + move.name + "!"
+        document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
+
 
         let damage = getDamage(this.pokemon, move, receiver.pokemon)
-        receiver.currentHp -= damage
-        if (receiver.currentHp <= 0) receiver.currentHp = 0
+        receiver.pokemon.currentHp -= damage
+        if (receiver.pokemon.currentHp <= 0) receiver.pokemon.currentHp = 0
 
         switch (move.name) {
             case "razor-leaf":
@@ -110,7 +122,7 @@ class Sprite {
                     y: receiver.position.y + receiver.image.height / 2,
                     onComplete: () => {
                         gsap.to(healthBar, {
-                            width: receiver.currentHp * 100 / receiver.pokemon.stats.hp + "%"
+                            width: receiver.pokemon.currentHp * 100 / receiver.pokemon.stats.hp + "%"
                         })
                         gsap.to(receiver.position, {
                             x: receiver.position.x + 10,
@@ -137,7 +149,7 @@ class Sprite {
                     duration: 0.1,
                     onComplete() {
                         gsap.to(healthBar, {
-                            width: receiver.currentHp * 100 / receiver.pokemon.stats.hp + "%"
+                            width: receiver.pokemon.currentHp * 100 / receiver.pokemon.stats.hp + "%"
                         })
                         gsap.to(receiver.position, {
                             x: receiver.position.x + 10,
@@ -159,7 +171,9 @@ class Sprite {
         }
     }
     faint() {
-        const dialogue = this.pokemon.name + " se debilitó!"
+        let enemyText = ""
+        if (this.isEnemy) enemyText = " enemigo"
+        const dialogue = this.pokemon.name + enemyText + " se debilitó!"
         document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
         gsap.to(this.position, {
             y: this.position.y + 20
@@ -167,6 +181,5 @@ class Sprite {
         gsap.to(this, {
             opacity: 0
         })
-        console.log("fainted")
     }
 }

@@ -122,13 +122,30 @@ h1 {
     background-color: #ddd;
 }
 
-.attack-bar .attack-type {
+.attack-bar .attack-info {
+    font-size: 38px;
     width: 308px;
     height: 155px;
-    margin-left: 32px;
-    margin-top: 19px;
+    margin-left: 60px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     font-family: monospace;
 }
+.attack-info #attack-pp {
+    position: absolute;
+    top: 40px;
+}
+.attack-info #attack-type {
+    position: absolute;
+    top: 110px;
+}
+
+#attack-type-img {
+    width: 100px;
+    margin-block-start: 70px;
+    margin-inline-start: 120px;
+}
+
+
