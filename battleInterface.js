@@ -24,56 +24,78 @@ let allySprite
 let renderedSprites
 let battleAnimationId
 let queue
-async function initBattle(pokemon) {
-    // Reestablecer elementos de la interfaz
-    document.querySelector("#user-interface").style.display = "block"
-    document.querySelector("#dialogue-box").style.display = "none"
-    document.querySelector("#ally-hp").style.width = "100%"
-    document.querySelector("#enemy-hp").style.width = "100%"
-    document.querySelector("#ally-xp").style.width = "0%"
-    document.querySelector(".buttons").replaceChildren()
-    // Carga los pokemones
-    const ally = new Pokemon(pokemon)
-    const enemy = new Pokemon(4)
-    // Esperar a que se carguen las propiedades de los pokemones
-    await ally.searchPokemon(ally.id)
-    await enemy.searchPokemon(enemy.id)
-    // Carga del sprite enemigo
-    enemySprite = new Sprite({
-        position: {
-            x: 610,
-            y: 10
-        },
-        image: enemyImg,
-        // frames: {max: 3,hold: 30}
-        animate: false, // true si quiero que el sprite del pokemon sea animado (buscar spritesheet))
-        pokemon: enemy,
-        isEnemy: true
-    })
-    enemySprite.image.onload = function () {
-        enemySprite.resizeImage(250, 250)
+
+document.querySelector("#dialogue-box").addEventListener("click", (e) =>{
+    if (queue.length > 0) {
+        queue[0]()
+        queue.shift()
+    } else {
+        e.currentTarget.style.display = "none"
+        document.querySelector(".menu-buttons").replaceChildren()
+        document.querySelector("#ally-info").style.display = "block"
+        document.querySelector("#enemy-info").style.display = "block"
+        showMenuBar()
     }
-    // Carga del sprite aliado
+})
+
+function presentBattle(ally, enemy) {
     allySprite = new Sprite({
         position: {
-            x: 100,
+            x: -565,
             y: 110
         },
         image: allyImg,
-        // frames: {max: 3,hold: 30}
-        animate: false, // true si quiero que el sprite del pokemon sea animado (buscar spritesheet))
+        animate: false,
         pokemon: ally
     })
     allySprite.image.onload = function () {
         allySprite.resizeImage(400, 400)
     }
-
-    for (const value in allySprite.pokemon.moves) {
-        const move = allySprite.pokemon.moves[value]
-        const button = document.createElement("button")
-        button.innerHTML = move.name.toUpperCase()
-        document.querySelector(".buttons").append(button)
+    enemySprite = new Sprite({
+        position: {
+            x: 1245,
+            y: 10
+        },
+        image: enemyImg,
+        animate:false,
+        pokemon: enemy,
+        isEnemy: true
+    })
+    enemySprite.image.onload = function () {
+    enemySprite.resizeImage(250, 250)
     }
+    document.querySelector("#dialogue-box").style.display = "block"
+    const dialogue = allySprite.pokemon.name.toUpperCase() + " contra " + enemySprite.pokemon.name.toUpperCase()
+    document.querySelector("#dialogue-box-text").innerHTML = dialogue
+    gsap.to(allySprite.position, {
+        x: 100,
+        duration: 0.9
+    })
+    gsap.to(enemySprite.position, {
+        x: 610,
+        duration: 0.9,
+    })
+}
+
+async function initBattle(pokemon) {
+    // Reestablecer elementos de la interfaz
+    document.querySelector("#dialogue-box-text").innerHTML = ""
+    document.querySelector("#user-interface").style.display = "block"
+    document.querySelector("#ally-info").style.display = "none"
+    document.querySelector("#enemy-info").style.display = "none"
+    document.querySelector("#ally-hp").style.width = "100%"
+    document.querySelector("#enemy-hp").style.width = "100%"
+    document.querySelector("#ally-xp").style.width = "0%"
+    document.querySelector(".menu-buttons").replaceChildren()
+
+    // Carga los pokemones
+    const ally = new Pokemon(pokemon)
+    const enemy = new Pokemon(1)
+    // Esperar a que se carguen las propiedades de los pokemones
+    await ally.searchPokemon(ally.id)
+    await enemy.searchPokemon(enemy.id)
+    await presentBattle(ally, enemy)
+
     // mostrar info estatica en pantalla
     allyImg.src = allySprite.pokemon.sprites.back
     allyImg.crossOrigin = "anonymous"
@@ -83,10 +105,67 @@ async function initBattle(pokemon) {
     nameEnemy.textContent = enemySprite.pokemon.name.toUpperCase()
     levelEnemy.textContent = "Lv" + `${enemySprite.pokemon.level}`
 
-    renderedSprites = [allySprite, enemySprite]
+    renderedSprites = [enemySprite, allySprite]
     queue = []
+}
 
-//////////////////////////////////////////////////
+const updateData = () => {
+    levelAlly.textContent = "Lv" + `${allySprite.pokemon.level}`
+    hpAlly.textContent = `${allySprite.pokemon.currentHp}` + "/" + `${allySprite.pokemon.stats.hp}`
+}
+
+function showMenuBar() {
+    document.querySelector("#menu-bar-img").style.display = "block"
+    document.querySelector("#menu-bar-text").style.display = "block"
+    document.querySelector("#menu-info-bar").style.display = "block"
+    document.querySelector("#attack-bar-img").style.display = "none"
+    document.querySelector("#attack-info-bar").style.display = "none"
+    document.querySelector(".attack-buttons").replaceChildren()
+    const fightButton  = document.createElement("button")
+    fightButton.innerHTML = "FIGHT"
+    const bagButton = document.createElement("button")
+    bagButton.innerHTML = "BAG"
+    const pokemonButton = document.createElement("button")
+    pokemonButton.innerHTML = "POKEMON"
+    const runButton = document.createElement("button")
+    runButton.innerHTML = "RUN"
+    document.querySelector(".menu-buttons").append(fightButton)
+    document.querySelector(".menu-buttons").append(bagButton)
+    document.querySelector(".menu-buttons").append(pokemonButton)
+    document.querySelector(".menu-buttons").append(runButton)
+    const dialogue = "Que debería hacer " + allySprite.pokemon.name.toUpperCase() + " ?"
+    document.querySelector("#menu-bar-text").innerHTML = dialogue
+
+    document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", (e) => {
+            const targetButton = e.currentTarget.innerHTML.toLowerCase()
+            if (targetButton === "fight") {
+                showAttackBar()
+            } else if (targetButton === "run") {
+                runAway()
+            }
+        })
+    })
+}
+
+function runAway() {
+    if (canRun(allySprite.pokemon, enemySprite.pokemon)) {
+        animateFaint()
+    } else console.log("No pudiste huir!")
+}
+
+function showAttackBar() {
+    document.querySelector("#menu-bar-img").style.display = "none"
+    document.querySelector("#menu-bar-text").style.display = "none"
+    document.querySelector("#menu-info-bar").style.display = "none"
+    document.querySelector("#attack-bar-img").style.display = "block"
+    document.querySelector("#attack-info-bar").style.display = "flex"
+    for (const value in allySprite.pokemon.moves) {
+        const move = allySprite.pokemon.moves[value]
+        const button = document.createElement("button")
+        button.innerHTML = move.name.toUpperCase()
+        document.querySelector(".attack-buttons").append(button)
+    }
     // Manejo de botones de ataque
     document.querySelectorAll('button').forEach((button) => {
         button.addEventListener("click", (e) => {
@@ -96,8 +175,7 @@ async function initBattle(pokemon) {
             selectedMove.currentPP -= 1
             allySprite.attack({
                 move: selectedMove,
-                receiver: enemySprite,
-                renderedSprites
+                receiver: enemySprite
             })
             // Enemigo debilitado
             if (enemySprite.pokemon.currentHp === 0) {
@@ -114,12 +192,12 @@ async function initBattle(pokemon) {
                 })
             }
             // Ataques de enemy
-            const randomMove = enemySprite.pokemon.moves["tackle"]//enemySprite.pokemon.moves[Math.floor(Math.random() * enemySprite.pokemon.moves.length)]
+            const randomMove = enemySprite.pokemon.moves["tackle"]
+
             queue.push(() => {
                 enemySprite.attack({
                     move: randomMove,
-                    receiver: allySprite,
-                    renderedSprites
+                    receiver: allySprite
                 })
                 if (allySprite.pokemon.currentHp <= 0) {
                     queue.push(() => {
@@ -134,10 +212,12 @@ async function initBattle(pokemon) {
         // Info de ataque al pasar el mouse por arriba del boton
         button.addEventListener("mouseenter", (e) =>{
             const targetAttack = allySprite.pokemon.moves[e.currentTarget.innerHTML.toLowerCase()]
+            console.log(targetAttack.stats.category)
             const attackPP = document.querySelector("#attack-pp")
             const attackType = document.querySelector("#attack-type-img")
             // const attackType = document.querySelector("#attack-type-ing")
             attackPP.innerHTML = "PP  " + targetAttack.currentPP + "/" + targetAttack.stats.pp
+            attackType.style.display = "block"
             attackType.src = typesImg[targetAttack.stats.type]//"assets/interface/secondary/types/grass.png"
 
         })
@@ -146,29 +226,15 @@ async function initBattle(pokemon) {
             const attackPP = document.querySelector("#attack-pp")
             const attackType = document.querySelector("#attack-type-img")
             attackPP.innerHTML = "PP"
-            attackType.src = ""
+            attackType.style.display = "none"
         })
     })
-}
-
-document.querySelector("#dialogue-box").addEventListener("click", (e) =>{
-    if (queue.length > 0) {
-        queue[0]()
-        queue.shift()
-    } else e.currentTarget.style.display = "none"
-})
-
-const updateData = () => {
-    levelAlly.textContent = "Lv" + `${allySprite.pokemon.level}`
-    hpAlly.textContent = `${allySprite.pokemon.currentHp}` + "/" + `${allySprite.pokemon.stats.hp}`
 }
 
 
 function animateBattle() {
     battleAnimationId = window.requestAnimationFrame(animateBattle)
     battleBackground.draw()
-    levelAlly.textContent = "Lv" + `${allySprite.pokemon.level}`
-    hpAlly.textContent = `${allySprite.pokemon.currentHp}` + "/" + `${allySprite.pokemon.stats.hp}`
     updateData()
 
     renderedSprites.forEach(sprite => {
@@ -182,8 +248,8 @@ function animateExperience() {
     const xp = getExperience(allySprite.pokemon, enemySprite.pokemon)
     allySprite.pokemon.currentXp += xp
     const nextLevelXp = allySprite.pokemon.getNextLevelXP()
-    const dialogue = allySprite.pokemon.name + ` ha ganado ${xp} de experiencia!`
-    document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
+    const dialogue = allySprite.pokemon.name.toUpperCase() + " ha ganado " + xp + " de experiencia!"
+    document.querySelector("#dialogue-box-text").innerHTML = dialogue
     xpPercentage = allySprite.pokemon.currentXp * 100 / nextLevelXp
     if (xpPercentage >= 100) {
         xpPercentage = 100

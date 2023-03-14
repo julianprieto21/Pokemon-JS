@@ -25,7 +25,7 @@
 
     <canvas></canvas>
 
-    <div id="user-interface">
+    <div id="user-interface" style="display: none">
         <div id="enemy-info">
             <img src="assets/interface/enemyInfo.png" alt="Enemy information">
             <div class="poke-info" id="name-enemy" style="left: 20px"></div>
@@ -48,21 +48,26 @@
                 <div id="ally-xp" style="width: 0;"></div>
             </div>
         </div>
-        <div class="attack-bar">
+        <div class="menu-bar">
 
-            <img src="assets/interface/fightBar.png" alt="Options fight-bar">
-            <div style="position: absolute; display: flex; top: 0; right: 0; bottom: 0; left: 0;">
-                        <div class="buttons"></div>
+            <img id="menu-bar-img" src="assets/interface/menuBar.png" alt="Menu bar" style="display: none; width: 1024px">
+            <div id="menu-info-bar" style="position:absolute;">
+                <div id="menu-bar-text"></div>
+                <div class="menu-buttons"></div>
+            </div>
+
+            <img id="attack-bar-img" src="assets/interface/fightBar.png" alt="Options fight-bar" style="display: none; width: 1024px">
+            <div id="attack-info-bar" style="position: absolute; display: none; top: 0; right: 0; bottom: 0; left: 0;">
+                        <div class="attack-buttons"></div>
                         <div class="attack-info">
                             <div id="attack-pp">PP</div>
                             <div id="attack-type">TYPE/</div>
-                            <img id="attack-type-img" src="" alt="type">
+                            <img id="attack-type-img" style="display: none" src="" alt="type">
                         </div>
             </div>
             <div id="dialogue-box" style="cursor: pointer; display: none; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: white;">
-                <div id="dialogue-box-text" style="position: absolute; padding: 40px; font-size: 32px; color: white;">Hola</div>
-                <img src="assets/interface/dialogueBar.png" alt="Options fight-bar">
-
+                <div id="dialogue-box-text" style="position: absolute; padding: 40px; font-size: 32px; color: white;"></div>
+                <img src="assets/interface/dialogueBar.png" alt="Dialogue Bar">
             </div>
         </div>
     </div>

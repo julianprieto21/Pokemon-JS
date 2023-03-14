@@ -152,7 +152,7 @@ function animate() {
                                 opacity: 0,
                                 duration: 0.3
                                 })
-                                initBattle()
+                                initBattle(player.team[0])
                                 animateBattle()
                             }
                         })
@@ -299,9 +299,14 @@ window.addEventListener("keyup", (e) => {
     }
 })
 
+function startBattle(id) {
+    initBattle(id)
+    animateBattle()
+}
+
 // animate()
-// console.log(player)
-initBattle(player.team[0])
+
+initBattle(player.team[1])
 animateBattle()
 
 

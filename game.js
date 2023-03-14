@@ -21,7 +21,7 @@ class Sprite {
                     animate,
                     isEnemy = false,
                     speed = 5,
-                    team = [1, 7, 110]}) {
+                    team = [1, 4, 7]}) {
         this.position = position
         this.image = image
         this.frames = {...frames, val: 0, elapsed: 0}
@@ -82,7 +82,7 @@ class Sprite {
         this.height = height
     }
 
-    attack({move, receiver, renderedSprites}) {
+    attack({move, receiver}) {
         let movementDistance = 20
         let healthBar = "#enemy-hp"
         let enemyText = ""
@@ -92,54 +92,17 @@ class Sprite {
             enemyText = " enemigo "
         }
         document.querySelector("#dialogue-box").style.display = "block"
-        const dialogue = this.pokemon.name + enemyText + " usó " + move.name + "!"
-        document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
+        const dialogue = this.pokemon.name.toUpperCase() + enemyText + " usó " + move.name.toUpperCase() + "!"
+        document.querySelector("#dialogue-box-text").innerHTML = dialogue
 
 
         let damage = getDamage(this.pokemon, move, receiver.pokemon)
         receiver.pokemon.currentHp -= damage
         if (receiver.pokemon.currentHp <= 0) receiver.pokemon.currentHp = 0
 
+        let projectileImg = new Image()
+        let projectile
         switch (move.name) {
-            case "razor-leaf":
-                const grassProjectileImg = new Image()
-                grassProjectileImg.src = "assets/animations/grassAnimation.png"
-                const grassProjectile = new Sprite({
-                    position: {
-                        x: this.position.x + this.image.width / 2,
-                        y: this.position.y + this.image.height / 2
-                    },
-                    image: grassProjectileImg,
-                    frames: {
-                        max: 4,
-                        hold: 5
-                    },
-                    animate: true
-                })
-                renderedSprites.splice(1, 0, grassProjectile)
-                gsap.to(grassProjectile.position, {
-                    x: receiver.position.x + receiver.image.width / 2,
-                    y: receiver.position.y + receiver.image.height / 2,
-                    onComplete: () => {
-                        gsap.to(healthBar, {
-                            width: receiver.pokemon.currentHp * 100 / receiver.pokemon.stats.hp + "%"
-                        })
-                        gsap.to(receiver.position, {
-                            x: receiver.position.x + 10,
-                            yoyo: true,
-                            repeat: 3,
-                            duration: 0.09
-                        })
-                        gsap.to(receiver, {
-                            opacity: 0.4,
-                            yoyo: true,
-                            repeat: 3,
-                            duration: 0.09
-                        })
-                        renderedSprites.splice(1, 1)
-                    }
-                })
-                break;
             case "tackle":
                 const tl = gsap.timeline()
                 tl.to(this.position, {
@@ -148,33 +111,44 @@ class Sprite {
                     x: this.position.x + movementDistance * 2,
                     duration: 0.1,
                     onComplete() {
-                        gsap.to(healthBar, {
-                            width: receiver.pokemon.currentHp * 100 / receiver.pokemon.stats.hp + "%"
-                        })
-                        gsap.to(receiver.position, {
-                            x: receiver.position.x + 10,
-                            yoyo: true,
-                            repeat: 3,
-                            duration: 0.09
-                        })
-                        gsap.to(receiver, {
-                            opacity: 0.4,
-                            yoyo: true,
-                            repeat: 3,
-                            duration: 0.09
-                        })
+                        animateDamage(receiver, healthBar)
                     }
                 }).to(this.position, {
                     x: this.position.x
                 })
                 break;
+            case "razor-leaf":
+                projectileImg.src = "assets/animations/grassAnimation.png"
+                break;
+            case "ember":
+                projectileImg.src = "assets/animations/fireAnimation.png"
+                break;
+            case "thunder-shock":
+                projectileImg.src = "assets/animations/electricAnimation.png"
+                break;
         }
+        if (projectileImg.src !== "") {
+            projectile = new Sprite({
+                position: {
+                    x: this.position.x + this.image.width / 2,
+                    y: this.position.y + this.image.height / 2
+                },
+                image: projectileImg,
+                frames: {
+                    max: 4,
+                    hold: 5
+                },
+                animate: true
+            })
+            animateProjectile(projectile, receiver, healthBar)
+        } else console.log("no projectile")
     }
+
     faint() {
         let enemyText = ""
         if (this.isEnemy) enemyText = " enemigo"
-        const dialogue = this.pokemon.name + enemyText + " se debilitó!"
-        document.querySelector("#dialogue-box-text").innerHTML = dialogue.toUpperCase()
+        const dialogue = this.pokemon.name.toUpperCase() + enemyText + " se debilitó!"
+        document.querySelector("#dialogue-box-text").innerHTML = dialogue
         gsap.to(this.position, {
             y: this.position.y + 20
         })
@@ -182,4 +156,33 @@ class Sprite {
             opacity: 0
         })
     }
+}
+
+function animateDamage(receiver, healthBar) {
+    gsap.to(healthBar, {
+        width: receiver.pokemon.currentHp * 100 / receiver.pokemon.stats.hp + "%"
+    })
+    gsap.to(receiver.position, {
+        x: receiver.position.x + 10,
+        yoyo: true,
+        repeat: 3,
+        duration: 0.09
+    })
+    gsap.to(receiver, {
+        opacity: 0.4,
+        yoyo: true,
+        repeat: 3,
+        duration: 0.09
+    })
+}
+function animateProjectile(projectile, receiver, healthBar) {
+    renderedSprites.splice(1, 0, projectile)
+    gsap.to(projectile.position, {
+        x: receiver.position.x + receiver.image.width / 3,
+        y: receiver.position.y + receiver.image.height / 3,
+        onComplete: () => {
+            animateDamage(receiver, healthBar)
+            renderedSprites.splice(1, 1)
+        }
+    })
 }

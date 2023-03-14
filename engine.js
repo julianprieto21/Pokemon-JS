@@ -20,7 +20,8 @@ class Move {
             accuracy: data.accuracy,
             power: data.power,
             pp: data.pp,
-            type: data.type.name
+            type: data.type.name,
+            category: data.damage_class.name
         }
         this.currentPP = this.stats.pp
     };
@@ -219,13 +220,19 @@ class Pokemon {
             case "fire":
                 moves = {
                     "tackle": new Move("tackle"),
-                    "razor-leaf": new Move("razor-leaf")
+                    "ember": new Move("ember")
                 }
                 break;
             case "water":
                 moves = {
                     "tackle": new Move("tackle"),
                     "razor-leaf": new Move("razor-leaf")
+                }
+                break;
+            case "electric":
+                moves = {
+                    "tackle": new Move("tackle"),
+                    "thunder-shock": new Move("thunder-shock")
                 }
         }
         return moves
@@ -264,5 +271,13 @@ getExperience = (winner, looser) => {
     const l = looser.level
     const c = 1
     return Math.floor((e * l * c) / 7)
-
 }
+
+canRun = (ally, enemy) => {
+    const a = ally.baseStats.speed[0]
+    const b = Math.max(1, enemy.baseStats.speed[0])
+    const f = (a/b*128) + 30
+    const n = Math.floor(Math.random() * 256)
+    return n < f
+}
+

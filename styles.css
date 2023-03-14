@@ -91,8 +91,34 @@ h1 {
     right: 0;
 }
 
+/*Menu Bar*/
+.menu-bar .menu-buttons {
+    margin-left: 699px;
+    margin-top: 20px;
+    width: 310px;
+    height: 153px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.menu-bar #menu-bar-text {
+    position: absolute;
+    padding: 40px;
+    font-size: 32px;
+    color: white;
+}
+.menu-buttons button {
+    background-color: rgb(248, 248, 248);
+    border: 0;
+    cursor: pointer;
+    font-size: 28px;
+    font-family: monospace;
+}
+.menu-buttons button:hover {
+    background-color: rgb(216, 208, 216);
+}
+
 /*Barra inferior de ataques*/
-.attack-bar {
+.menu-bar {
     height: 193px;
     position: absolute;
     right: 0;
@@ -101,16 +127,16 @@ h1 {
     display: flex;
 }
 
-.attack-bar .buttons {
-    width: 644px;
-    height: 155px;
+.menu-bar .attack-buttons {
+    width: 671px;
+    height: 153px;
     margin-left: 20px;
-    margin-top: 19px;
+    margin-top: 20px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
 
-.attack-bar .buttons button {
+.menu-bar .attack-buttons button {
     background-color: rgb(248, 248, 248);
     border: 0;
     cursor: pointer;
@@ -118,11 +144,11 @@ h1 {
     font-family: monospace;
 }
 
-.attack-bar .buttons button:hover {
-    background-color: #ddd;
+.menu-bar .attack-buttons button:hover {
+    background-color: rgb(216, 208, 216);
 }
 
-.attack-bar .attack-info {
+.menu-bar .attack-info {
     font-size: 38px;
     width: 308px;
     height: 155px;
@@ -146,6 +172,32 @@ h1 {
     width: 100px;
     margin-block-start: 70px;
     margin-inline-start: 120px;
+}
+
+/*Side bar*/
+#side-bar #pokemon-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: inherit;
+    justify-content: center;
+    margin: 25px 24px 24px 24px ;
+}
+.pokemon {
+    background-color: rgb(40, 80, 104);
+    cursor: pointer;
+    border: 0;
+}
+.pokemon:hover {
+    background-color: rgb(224, 216, 224);
+}
+.pokemon-icon {
+    width: 120px;
+    height: 84px;
 }
 
 
